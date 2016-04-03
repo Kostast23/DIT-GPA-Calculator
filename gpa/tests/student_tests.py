@@ -2,6 +2,7 @@
 
 import unittest
 
+from gpa.student import Course
 from gpa.student import Exam
 
 
@@ -31,6 +32,30 @@ class ExamTests(unittest.TestCase):
         later_year_exam = Exam('20150201', '5')     # date: 02/2015
         self.assertFalse(self.exam < earlier_year_exam)
         self.assertTrue(self.exam < later_year_exam)
+
+
+class CourseTests(unittest.TestCase):
+    def setUp(self):
+        self.course = Course('CourseName')
+
+    def test_course_name_matches(self):
+        self.assertEqual(self.course.name, 'CourseName')
+
+    def test_course_exams_list_is_empty(self):
+        self.assertListEqual(self.course.exams, [])
+
+    def test_adding_exam_to_course(self):
+        exams = [Exam('20120201', '10')]
+        self.course.add_exam(exams[0])
+        self.assertItemsEqual(self.course.exams, exams)
+
+    def test_grades_are_added_ordered_by_date(self):
+        exam = Exam('20120201', '4')            # date: 02/2012
+        later_exam = Exam('20120901', '9')      # date: 09/2012
+        exams = [exam, later_exam]
+        self.course.add_exam(later_exam)
+        self.course.add_exam(exam)
+        self.assertListEqual(self.course.exams, exams)
 
 
 def main():

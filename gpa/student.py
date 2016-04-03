@@ -1,5 +1,7 @@
 # *-* encoding=utf-8 *-*
 
+import bisect
+
 
 class Exam(object):
     """A student's Exam date and grade.
@@ -39,3 +41,29 @@ class Exam(object):
     def __lt__(self, other):
         """Returns true if the exam was held earlier than the other exam."""
         return self.date < other.date
+
+
+class Course(object):
+    """Information about the course and the student's exam history in it.
+
+    Attributes:
+        name (str): The course's name.
+        exams (list): List of Exams instances sorted from old to new.
+    """
+
+    passing_grade = 5
+
+    def __init__(self, name):
+        self.name = name
+        self.exams = []
+
+    def add_exam(self, exam):
+        """Adds the exam to the list respecting Exam ordering."""
+        bisect.insort_left(self.exams, exam)
+
+    def get_passed_exam(self):
+        """In case there is an exam with passing grade return it."""
+        if len(self.exams) != 0 and self.exams[-1].grade >= self.passing_grade:
+            return self.exams[-1]
+        else:
+            return None
