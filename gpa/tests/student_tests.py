@@ -4,6 +4,7 @@ import unittest
 
 from gpa.student import Course
 from gpa.student import Exam
+from gpa.student import StudentRecord
 
 
 class ExamTests(unittest.TestCase):
@@ -56,6 +57,43 @@ class CourseTests(unittest.TestCase):
         self.course.add_exam(later_exam)
         self.course.add_exam(exam)
         self.assertListEqual(self.course.exams, exams)
+
+
+class StudentRecordTests(unittest.TestCase):
+    def setUp(self):
+        self.record = StudentRecord()
+
+    def test_empty_record(self):
+        # Record should not contain any courses.
+        self.assertEqual(len(self.record.courses), 0)
+        self.assertRaises(KeyError, lambda: self.record.courses['ABC'])
+        self.assertRaises(KeyError, lambda: self.record.courses['DEF'])
+
+    def test_adding_one_exam(self):
+        self.record.add_exam('ABC', 'ABC_NAME', '20150202', '5')
+
+        # Record should contain one course cause only one is being added.
+        self.assertEqual(len(self.record.courses), 1)
+        self.assertTrue(self.record.courses['ABC'])
+
+    def test_adding_two_exams_of_different_courses(self):
+        self.record.add_exam('ABC', 'ABC_NAME', '20150202', '5')
+        self.record.add_exam('DEF', 'DEF_NAME', '20160202', '6')
+
+        # Record should contain two courses cause two exams of different
+        # courses are being added.
+        self.assertEqual(len(self.record.courses), 2)
+        self.assertTrue(self.record.courses['ABC'])
+        self.assertTrue(self.record.courses['DEF'])
+
+    def test_adding_two_exams_of_the_same_course(self):
+        self.record.add_exam('ABC', 'ABC_NAME', '20150202', '5')
+        self.record.add_exam('ABC', 'ABC_NAME', '20150602', '10')
+
+        # Record should contain only one course cause the two exams that
+        # are being added are of the same course
+        self.assertEqual(len(self.record.courses), 1)
+        self.assertTrue(self.record.courses['ABC'])
 
 
 def main():
