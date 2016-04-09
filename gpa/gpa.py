@@ -56,5 +56,27 @@ def read_ects_file(ects_file):
     return ects_rules
 
 
+def calculate_gpa(student_record, ects_rules):
+    """Calculates the GPA given a student exam history and the ects rules.
+
+    Args:
+
+    """
+    grade_sum = .0
+    ects_sum = 0
+
+    for code, course in student_record.courses.items():
+        exam = course.get_passed_exam()
+        if exam is None:
+            continue
+        if code in ects_rules:
+            rule = ects_rules[code]
+            ects = rule.get_ects_at_date(exam.date)
+            grade_sum += exam.grade * ects
+            ects_sum += ects
+
+    return grade_sum / ects_sum
+
+
 if __name__ == '__main__':
     pass
