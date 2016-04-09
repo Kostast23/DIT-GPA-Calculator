@@ -32,5 +32,29 @@ def read_exams_text(exams_text):
     return record
 
 
+# Regular expression used to read ects information from text.
+ECTS_REGEX = r'.* (?P<code>\d+) (?P<year>\d+) (?P<ects_before>\d+) (?P<ects_after>\d+)'
+
+
+def read_ects_file(ects_file):
+    """Reads ects information from a file and returns a map from course code to
+    course ects information.
+
+    Args:
+        ects_file (str): Path of the input file.
+    """
+    ects_rules = dict()
+    prog = re.compile(ECTS_REGEX)
+
+    with open(ects_file, 'r') as f:
+        for line in f.readlines():
+            match = prog.search(line)
+            if match is not None:
+                rule = ECTSRule(match.group('year'), match.group('ects_before'),
+                                match.group('ects_after'))
+                ects_rules[match.group('code')] = rule
+    return ects_rules
+
+
 if __name__ == '__main__':
     pass
