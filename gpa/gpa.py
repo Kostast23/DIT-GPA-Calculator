@@ -78,5 +78,38 @@ def calculate_gpa(student_record, ects_rules):
     return grade_sum / ects_sum
 
 
+LOGIN_URL = 'https://my-studies.uoa.gr/Secr3w/connect.aspx'
+EXAMS_URL = 'https://my-studies.uoa.gr/Secr3w/app/accHistory/accadFooter.aspx'
+ECTS_RULES_FILE = '../ects.dat'
+
+
+def main():
+    username = raw_input('username: ')
+    password = getpass.getpass('password: ')
+    login_creds = {'username': username, 'password': password}
+
+    # Create a persistant session to login and then make a request to the exam
+    # history page to retrieve the needed data
+    with requests.Session() as s:
+        s.mount('https://', TLSv1Adapter())
+        try:
+            s.post(LOGIN_URL, data=login_creds)         # login
+            response = s.get(EXAMS_URL)                 # get exam history page
+        except requests.exceptions.RequestException:
+            print "There was a connection error!"
+            sys.exit(1)
+
+    student_record = read_exams_text(response.text)
+
+    # Check if the response text included any exam information
+    if student_record.empty():
+        print "Bad login information or no exam history!"
+        sys.exit(2)
+
+    ects_rules = read_ects_file(ECTS_RULES_FILE)
+    gpa = calculate_gpa(student_record, ects_rules)
+    print 'GPA: {0:.2f}'.format(gpa)
+
+
 if __name__ == '__main__':
-    pass
+    main()
